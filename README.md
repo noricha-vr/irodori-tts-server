@@ -620,3 +620,32 @@ Model weights and codec assets are distributed separately. Check the Hugging Fac
 
 - [Aratako/Irodori-TTS-v4-Small](https://huggingface.co/Aratako/Irodori-TTS-v4-Small)
 - [Aratako/Semantic-DACVAE-Japanese-32dim](https://huggingface.co/Aratako/Semantic-DACVAE-Japanese-32dim)
+
+## このフォーク（noricha-vr）の差分: Mac Studio ローカル常駐
+
+上流 `Aratako/Irodori-TTS-Server` を、`~/.claude/skills/irodori-tts`（`notify.sh`）と periodic-worker の音声通知バックエンドとして port 2618 に常駐させる。
+
+| 項目 | 内容 |
+|---|---|
+| ライブラリ固定 | `pyproject.toml` の `[tool.uv.sources]` で `irodori-tts` を rev `89f9d8f`（2026-09-12、MeanFlow 対応）に固定。`uv.lock` を追跡 |
+| 設定 | `local.env`（秘密情報なし・追跡）。`.env` はその symlink（`scripts/setup-local.sh` が作る） |
+| 参照音声 | `voices/voices.json` で `Ellis` → `~/.claude/skills/irodori-tts/voices/Ellis-reference-30s.wav`（wav 本体は skill 側が正本） |
+| 既定 | `IRODORI_DEFAULT_VOICE=Ellis`、`IRODORI_PRELOAD=true`（起動時ロード）、`IRODORI_MAX_CONCURRENT_SYNTHESIS=1`（MPS は並列で落ちる） |
+| LaunchAgent | `launchd/com.ms25.irodori-tts-server.plist`（`launchd-delay-exec 45` でログイン直後の負荷を平準化）。ログ `~/Library/Logs/irodori-tts-server.log` |
+| MeanFlow | `local.env` の `IRODORI_HF_CHECKPOINT` を `Aratako/Irodori-TTS-v4.1-Small-MF` に切り替えて `launchctl kickstart -k gui/$(id -u)/com.ms25.irodori-tts-server` |
+
+```bash
+bash scripts/setup-local.sh            # .env symlink + uv sync --frozen
+bash scripts/setup-local.sh --launchd  # 上記 + LaunchAgent 登録・起動
+curl -s http://127.0.0.1:2618/health | jq '.status, .runtime.loaded'
+curl -s http://127.0.0.1:2618/v1/audio/voices | jq '[.data[].id]'   # ["Ellis","none"]
+```
+
+ロールバック（旧 `irodori-tts-api` の FastAPI へ戻す）:
+
+```bash
+launchctl bootout "gui/$(id -u)/com.ms25.irodori-tts-server"
+launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.ms25.irodori-tts-api.plist
+```
+
+上流への追従は `git fetch origin && git merge origin/main` の後、`uv lock --upgrade-package irodori-tts` で rev を上げて `uv.lock` をコミットする。
