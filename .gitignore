@@ -23,3 +23,6 @@ voices/*
 *.pt
 *.pth
 
+
+# fork: 設定はシークレット無しの local.env を追跡し、.env はそこへの symlink（setup-local.sh）
+!voices/voices.json

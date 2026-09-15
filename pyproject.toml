@@ -8,7 +8,7 @@ requires-python = ">=3.10"
 dependencies = [
     "fastapi>=0.115.0",
     "huggingface-hub>=0.34.0",
-    "irodori-tts @ git+https://github.com/Aratako/Irodori-TTS.git",
+    "irodori-tts",
     "pydantic-settings>=2.6.0",
     "python-dotenv>=1.0.1",
     "python-multipart>=0.0.9",
@@ -55,6 +55,8 @@ conflicts = [
 ]
 
 [tool.uv.sources]
+# 上流ライブラリを rev 固定（2026-09-12 MeanFlow / v4-Large 対応コミット）
+irodori-tts = { git = "https://github.com/Aratako/Irodori-TTS.git", rev = "89f9d8fbd4d51ea019867ee1197725ede1df13c5" }
 torch = [
     { index = "pytorch-cpu", extra = "cpu", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
     { index = "pytorch-cu128", extra = "cu128", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },

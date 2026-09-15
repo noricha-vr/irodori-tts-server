@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.ms25.irodori-tts-server</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/ms25/.local/libexec/launchd-delay-exec</string>
+        <string>45</string>
+        <string>--</string>
+        <string>/opt/homebrew/bin/uv</string>
+        <string>run</string>
+        <string>--no-sync</string>
+        <string>python</string>
+        <string>-m</string>
+        <string>irodori_openai_tts</string>
+        <string>--host</string>
+        <string>127.0.0.1</string>
+        <string>--port</string>
+        <string>2618</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/Users/ms25/project/irodori-tts-server</string>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/Users/ms25/Library/Logs/irodori-tts-server.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/ms25/Library/Logs/irodori-tts-server.log</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    </dict>
+</dict>
+</plist>
