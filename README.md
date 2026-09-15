@@ -645,7 +645,9 @@ curl -s http://127.0.0.1:2618/v1/audio/voices | jq '[.data[].id]'   # ["Ellis","
 
 ```bash
 launchctl bootout "gui/$(id -u)/com.ms25.irodori-tts-server"
+launchctl enable "gui/$(id -u)/com.ms25.irodori-tts-api"     # 切替時に disable 済み（次回ログインの二重起動防止）
 launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.ms25.irodori-tts-api.plist
+git -C ~/.claude revert --no-edit HEAD~1..HEAD                 # notify.sh / doctor.sh を旧 API 版へ（該当コミットを指定）
 ```
 
 上流への追従は `git fetch origin && git merge origin/main` の後、`uv lock --upgrade-package irodori-tts` で rev を上げて `uv.lock` をコミットする。
